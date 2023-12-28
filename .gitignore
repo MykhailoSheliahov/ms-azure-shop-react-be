@@ -1,0 +1,10 @@
+.vscode
+local.settings.json
+node_modules
+dist
+
+# Terraform artifacts
+.terraform
+.terraform.tfstate.lock.info
+terraform.tfstate
+terraform.tfstate.backup
