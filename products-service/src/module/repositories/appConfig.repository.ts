@@ -21,7 +21,7 @@ export class AppConfigRepository {
       return configs
     }
     catch (err) {
-      throw err
+      throw err;
     }
   }
 }
