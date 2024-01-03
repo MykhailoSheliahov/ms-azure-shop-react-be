@@ -1,22 +1,21 @@
-import { injectable } from "inversify";
+import { inject, injectable } from "inversify";
+import { Database, Container } from "@azure/cosmos";
 
 import { Product } from "../types";
-import { productList } from "./product.mock";
+import { COSMOS_DB } from "../../common/cosmos/cosmos-database";
 
 @injectable()
 export class ProductsRepository {
-  constructor() { }
+  public readonly container: Container;
+
+  constructor(@inject(COSMOS_DB) private readonly database: Database) {
+    this.container = database.container('products')
+  }
 
   async getProducts(): Promise<Product[]> {
     try {
-      const getProducts = new Promise<Product[]>(res => res(productList));
-      const products = await getProducts;
-
-      if (!products) {
-        throw ({ statusCode: 500, message: "Error during receiving products" });
-      }
-
-      return products;
+      const response = await this.container.items.query(`SELECT * FROM c`).fetchAll();
+      return response.resources.map(({ id, title, description, price }) => ({ id, title, description, price }))
     } catch (err) {
       throw err;
     }
@@ -24,19 +23,28 @@ export class ProductsRepository {
 
   async getProductById(id: string): Promise<Product> {
     try {
-      const getProductById = new Promise<Product>(res => {
-        const product = productList.find((p: Product) => p.id === id);
+      const response = await this.container.item(id, id).read();
+      const {
+        id: ids,
+        title,
+        description,
+        price
+      } = response.resource;
 
-        if (!product) {
-          throw ({ statusCode: 404, message: `There is no product with id - ${id}` });
-        }
+      return {
+        id: ids,
+        title,
+        description,
+        price,
+      }
+    } catch (err) {
+      throw err;
+    }
+  }
 
-        res(product);
-      });
-
-      const product = await getProductById;
-
-      return product;
+  async upsertProduct(product: Product): Promise<void> {
+    try {
+      await this.container.items.upsert(product);
     } catch (err) {
       throw err;
     }
