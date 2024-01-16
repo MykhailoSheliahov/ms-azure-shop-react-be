@@ -150,26 +150,6 @@ resource "azurerm_api_management_api_operation" "get_products_total" {
   url_template        = "/product/total"
 }
 
-resource "azurerm_api_management_api_operation" "post_product" {
-  api_management_name = azurerm_api_management.core_apim.name
-  api_name            = azurerm_api_management_api.products_api.name
-  display_name        = "Create Product"
-  method              = "POST"
-  operation_id        = "post-product"
-  resource_group_name = azurerm_resource_group.apim.name
-  url_template        = "/products"
-}
-
-resource "azurerm_api_management_api_operation" "get_products_total" {
-  api_management_name = azurerm_api_management.core_apim.name
-  api_name            = azurerm_api_management_api.products_api.name
-  display_name        = "Get Products Total"
-  method              = "GET"
-  operation_id        = "get-products-total"
-  resource_group_name = azurerm_resource_group.apim.name
-  url_template        = "/product/total"
-}
-
 ## Product Service Function
 resource "azurerm_resource_group" "product_service_rg" {
   location = "northeurope"
