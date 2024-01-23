@@ -10,6 +10,10 @@ export class AppConfigService {
   ) { }
 
   async getAppConfig(name: string): Promise<GetConfigurationSettingResponse> {
-    return await this.appConfigRepository.getAppConfig(name);
+    try {
+      return await this.appConfigRepository.getAppConfig(name);
+    } catch (err) {
+      throw err;
+    }
   }
 }

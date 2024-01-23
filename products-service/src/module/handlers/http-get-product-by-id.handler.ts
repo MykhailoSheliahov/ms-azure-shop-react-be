@@ -20,7 +20,7 @@ export class HttpGetProductByIdHandler extends BaseHandler {
     try {
       this.logger.info('HTTP trigger HttpGetProductByIdHandler function processed a request.');
 
-      const res = await this.appConfigService.getAppConfig('WEBSITE_CONTENTSHARE')
+      await this.appConfigService.getAppConfig('WEBSITE_CONTENTSHARE')
       const product = await this.productsService.getProductById(context.req.params.id)
 
       context.res = { body: product };
