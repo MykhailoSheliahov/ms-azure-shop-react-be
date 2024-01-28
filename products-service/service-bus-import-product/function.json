@@ -1,0 +1,16 @@
+{
+  "bindings": [
+    {
+      "name": "importproduct",
+      "type": "serviceBusTrigger",
+      "direction": "in",
+      "topicName": "sb-topic-products-updates",
+      "subscriptionName": "sb-subscription-product-batch-created",
+      "connection": "CONNECTION_SERVICE_BUS",
+      "accessRights": "listen",
+      "autoComplete": true
+    }
+  ],
+  "disabled": false,
+  "scriptFile": "../dist/service-bus-import-product/index.js"
+}

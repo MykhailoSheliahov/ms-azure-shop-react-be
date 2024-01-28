@@ -6,6 +6,8 @@ import { BaseHandler } from "../../common/handlers/base.handler";
 import { Logger } from "../../common/logger/logger";
 import { ProductsService } from "../services/products.service";
 import { isDataValid } from './../utils';
+import { serviceBus } from "./service-bus.handler";
+import { EventType, Topic } from "../constants";
 
 @injectable()
 export class HttpPostProductsHandler extends BaseHandler {
@@ -30,9 +32,11 @@ export class HttpPostProductsHandler extends BaseHandler {
         throw ({ statusCode: 400, message: 'Product data is invalid' });
       }
 
-      context.res = {
-        body: await this.productsService.createProduct(data)
-      };
+      await serviceBus(Topic.productUpdates, data, {
+        eventType: EventType.productItemCreated,
+      })
+
+      this.logger.info(`HttpPostProductsHandler handled successfully`);
     } catch (err) {
       this.logger.error(`Error in HttpPostProductsHandler - ${JSON.stringify(err)}`);
 

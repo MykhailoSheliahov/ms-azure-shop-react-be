@@ -8,14 +8,13 @@ import { ProductUI } from './../types'
 import { BaseHandler } from "../../common/handlers/base.handler";
 import { Logger } from "../../common/logger/logger";
 import { isDataValid } from "../utils";
-import { ProductsService } from "../services/products.service";
-import { UPLOAD_FILE_CONTAINER, PARSE_FILE_CONTAINER } from "../constants";
+import { serviceBus } from "./service-bus.handler";
+import { UPLOAD_FILE_CONTAINER, PARSE_FILE_CONTAINER, Topic, EventType } from "../constants";
 
 @injectable()
 export class BlobImportProductsFromFileHandler extends BaseHandler {
   constructor(
     private readonly logger: Logger,
-    private readonly productsService: ProductsService,
   ) {
     super();
   }
@@ -44,7 +43,10 @@ export class BlobImportProductsFromFileHandler extends BaseHandler {
           throw ({ statusCode: 400, message: 'Product data is invalid' });
         }
 
-        await this.productsService.createProduct(data)
+        await serviceBus(Topic.productUpdates, data, {
+          eventType: EventType.productCreated,
+        });
+
         this.logger.info(`Record created - ${JSON.stringify(data)}`);
       }))
 
