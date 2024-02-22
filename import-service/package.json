@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@azure/cosmos": "^4.0.0",
+    "@azure/service-bus": "^7.9.3",
     "@azure/storage-blob": "^12.17.0",
     "csv-parse": "^5.5.2",
     "inversify": "^6.0.2",

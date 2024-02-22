@@ -1,0 +1,16 @@
+{
+  "bindings": [
+    {
+      "name": "sbsubscriptiongetproductbyid",
+      "type": "serviceBusTrigger",
+      "direction": "in",
+      "topicName": "sb-topic-products-updates",
+      "subscriptionName": "sb-subscription-get-product-by-id",
+      "connection": "CONNECTION_SERVICE_BUS",
+      "accessRights": "listen",
+      "autoComplete": true
+    }
+  ],
+  "disabled": false,
+  "scriptFile": "../dist/service-bus-get-product-by-id/index.js"
+}

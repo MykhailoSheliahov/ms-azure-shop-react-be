@@ -517,3 +517,71 @@ resource "azurerm_api_management_api_operation" "import_file" {
     }
   }
 }
+
+## Service Bus
+
+resource "azurerm_resource_group" "service_bus" {
+  location = "northeurope"
+  name     = "rg-sb-integration-ne-001"
+}
+
+resource "azurerm_servicebus_namespace" "integration_sb" {
+  location            = "northeurope"
+  name                = "sb-integration-ne-001"
+  resource_group_name = azurerm_resource_group.service_bus.name
+  sku                 = "Standard"
+  capacity            = 0 /* standard for sku plan */
+  zone_redundant      = false
+}
+
+resource "azurerm_servicebus_topic" "products" {
+  name                                    = "sb-topic-products-updates"
+  namespace_id                            = azurerm_servicebus_namespace.integration_sb.id
+  requires_duplicate_detection            = true
+  duplicate_detection_history_time_window = "PT20S"
+}
+
+resource "azurerm_servicebus_subscription" "product_created" {
+  name                                      = "sb-subscription-product-created"
+  topic_id                                  = azurerm_servicebus_topic.products.id
+  max_delivery_count                        = 2
+  dead_lettering_on_filter_evaluation_error = true
+  dead_lettering_on_message_expiration      = true
+}
+
+resource "azurerm_servicebus_subscription_rule" "product_created_event_type_filter" {
+  name            = "event-type-product-created"
+  subscription_id = azurerm_servicebus_subscription.product_created.id
+  filter_type     = "SqlFilter"
+  sql_filter      = "eventType = 'sb-subscription-product-created'"
+}
+
+resource "azurerm_servicebus_subscription" "product_batch_created" {
+  name                                      = "sb-subscription-product-batch-created"
+  topic_id                                  = azurerm_servicebus_topic.products.id
+  max_delivery_count                        = 2
+  dead_lettering_on_filter_evaluation_error = true
+  dead_lettering_on_message_expiration      = true
+}
+
+resource "azurerm_servicebus_subscription_rule" "product_updated_event_type_filter" {
+  name            = "event-type-product-batch-created"
+  subscription_id = azurerm_servicebus_subscription.product_batch_created.id
+  filter_type     = "SqlFilter"
+  sql_filter      = "eventType = 'sb-subscription-product-batch-created'"
+}
+
+resource "azurerm_servicebus_subscription" "product_item" {
+  name                                      = "sb-subscription-get-product-by-id"
+  topic_id                                  = azurerm_servicebus_topic.products.id
+  max_delivery_count                        = 2
+  dead_lettering_on_filter_evaluation_error = true
+  dead_lettering_on_message_expiration      = true
+}
+
+resource "azurerm_servicebus_subscription_rule" "product_item_event_type_filter" {
+  name            = "event-type-get-product-by-id"
+  subscription_id = azurerm_servicebus_subscription.product_item.id
+  filter_type     = "SqlFilter"
+  sql_filter      = "eventType = 'sb-subscription-get-product-by-id'"
+}

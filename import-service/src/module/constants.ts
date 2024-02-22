@@ -10,3 +10,11 @@ export const PRODUCT_MOCK: ProductUI = {
   "price": 517,
   "count": 10,
 }
+
+export enum EventType {
+  productCreated = "sb-subscription-product-batch-created",
+}
+
+export enum Topic {
+  productUpdates = "sb-topic-products-updates",
+}
